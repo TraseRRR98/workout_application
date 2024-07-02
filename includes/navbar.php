@@ -18,7 +18,7 @@
                 <a class="nav-link text-white" href="/workout_application/pages/exercises/exercises.php">Exercises</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white" href="/workout_application/plans.php">Plans</a>
+                <a class="nav-link text-white" href="/workout_application/pages/plans/plans.php">Plans</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-white" href="/workout_application/plans.php">Workouts</a>

@@ -1,7 +1,8 @@
 <?php
 include '../../includes/header.php';
 include '../../includes/db_connect.php';
-
+include '../../includes/accesibles.php';
+///////////////////////////////////////////////////////////////////////////////////////
 function getExercise($ID) {
     global $conn;
     $stmt = $conn->prepare("SELECT Name, Muscle_Group FROM exercises WHERE ID = ?");
@@ -12,7 +13,7 @@ function getExercise($ID) {
     $stmt->close();
     return ['name' => $name, 'muscleGroup' => $muscleGroup];
 }
-
+///////////////////////////////////////////////////////////////////////////////////////
 function updateExercise($ID, $name, $muscleGroup) {
     global $conn;
     $stmt = $conn->prepare("UPDATE exercises SET Name = ?, Muscle_Group = ? WHERE ID = ?");
@@ -28,14 +29,17 @@ function updateExercise($ID, $name, $muscleGroup) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updateExercise'])) {
-    updateExercise($_POST['ID'], $_POST['name'], $_POST['muscleGroup']);
+    $ID = get_safe('ID');
+    $name = get_safe('name');
+    $muscleGroup = get_safe('muscleGroup');
+    updateExercise($ID, $name, $muscleGroup);
     header('Location: exercises.php');
     exit;
 }
 
-$exercise = getExercise($_GET['ID']);
+$exercise = getExercise(get_safe('ID'));
 ?>
-
+<!------------------------------------------------------------------------------------>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,3 +77,4 @@ $exercise = getExercise($_GET['ID']);
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+<!------------------------------------------------------------------------------------>

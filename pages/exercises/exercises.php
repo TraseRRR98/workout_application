@@ -1,6 +1,7 @@
 <?php
 include '../../includes/header.php';
 include '../../includes/db_connect.php';
+include '../../includes/accesibles.php';
 ///////////////////////////////////////////////////////////////////////////////////////
 function displayExercises() {
     global $conn;
@@ -15,10 +16,12 @@ function displayExercises() {
         // output data of each row
         while($row = $result->fetch_assoc()) {    
             echo "<tr>
-                    <td>{$row['ID']}</td><td>{$row['Name']}</td><td>{$row['Muscle_Group']}</td>
+                    <td>" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td>" . htmlspecialchars($row['Name'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td>" . htmlspecialchars($row['Muscle_Group'], ENT_QUOTES, 'UTF-8') . "</td>
                     <td class='exerciseTableActions'>
-                        <a href='editExercise.php?ID={$row['ID']}' class='button button-edit'><i class='fas fa-edit'></i>Edit</a>
-                        <a href='?deleteID={$row['ID']}' class='button button-delete' onclick='return confirm(\"Are you sure you want to delete this exercise?\");'><i class='fas fa-trash-alt'></i>Delete</a>
+                        <a href='editExercise.php?ID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-edit'><i class='fas fa-edit'></i>Edit</a>
+                        <a href='?deleteID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-delete' onclick='return confirm(\"Are you sure you want to delete this exercise?\");'><i class='fas fa-trash-alt'></i>Delete</a>
                     </td>
                   </tr>";
         }
@@ -58,11 +61,14 @@ function addExercise($name, $muscleGroup) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addExercise'])) {
-    addExercise($_POST['name'], $_POST['muscleGroup']);
+    $name = get_safe('name');
+    $muscleGroup = get_safe('muscleGroup');
+    addExercise($name, $muscleGroup);
 }
 
 if (isset($_GET['deleteID'])) {
-    deleteExercise($_GET['deleteID']);
+    $ID = get_safe('deleteID');
+    deleteExercise($ID);
 }
 ?>
 
