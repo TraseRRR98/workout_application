@@ -1,9 +1,20 @@
 /* public/css/styles.css */
-body {
-    padding-top: 56px;
-}
 
 footer {
     padding: 1rem 0;
     background-color: #f8f9fa;
+}
+
+@media (max-width: 767px) {
+    .table-container {
+        overflow-x: auto;
+    }
+    .form-inline {
+        display: flex;
+        flex-direction: column;
+    }
+    .form-inline .form-group {
+        margin-bottom: 10px;
+        width: 100%;
+    }
 }

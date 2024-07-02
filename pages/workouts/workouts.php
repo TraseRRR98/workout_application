@@ -4,6 +4,12 @@ include '../../includes/db_connect.php';
 include '../../includes/accesibles.php';
 include '../../pages/workouts/progressive_overload.php';  // Include the progressive overloading logic
 
+$strategies = [
+    1 => 'Percentage Increase',
+    2 => 'Fixed Increase',
+    3 => 'Reps Increase'
+];
+
 if (isset($_GET['applyOverload'])) {
     $workoutID = get_safe('workoutID');
     echo "Applying overload to workout ID: $workoutID"; // Debugging output
@@ -30,7 +36,7 @@ if (isset($_GET['applyOverload'])) {
 
 $selectedUnit = isset($_GET['unit']) ? get_safe('unit') : 'lbs'; // Default to lbs if no unit is selected
 
-function displayWorkouts($planID = null, $unit = 'lbs') {
+function displayWorkouts($planID = null, $unit = 'lbs', $strategies) {
     global $conn;
     $sql = "SELECT w.ID, p.Name as Plan_Name, e.Name as Exercise_Name, w.Sets, w.Reps, w.Weight, w.Progressive_Overloading_Strategy 
             FROM workouts w 
@@ -63,11 +69,12 @@ function displayWorkouts($planID = null, $unit = 'lbs') {
                     <td>" . htmlspecialchars($row['Sets'], ENT_QUOTES, 'UTF-8') . "</td>
                     <td>" . htmlspecialchars($row['Reps'], ENT_QUOTES, 'UTF-8') . "</td>
                     <td>" . htmlspecialchars(number_format($weight, 2), ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($row['Progressive_Overloading_Strategy'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td>" . htmlspecialchars($strategies[$row['Progressive_Overloading_Strategy']], ENT_QUOTES, 'UTF-8') . "</td>
                     <td class='workoutTableActions'>
                         <a href='editWorkout.php?ID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-edit'><i class='fas fa-edit'></i>Edit</a>
                         <a href='?deleteID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "&unit=" . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "' class='button button-delete' onclick='return confirm(\"Are you sure you want to delete this workout?\");'><i class='fas fa-trash-alt'></i>Delete</a>
                         <a href='?applyOverload=true&workoutID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "&unit=" . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "' class='button button-apply'><i class='fas fa-sync-alt'></i> Apply Overload</a>
+                        <a href='workout_history.php?workoutID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-history'><i class='fas fa-history'></i> History</a>
                     </td>
                   </tr>";
         }
@@ -117,6 +124,7 @@ $selectedPlanID = isset($_GET['planID']) ? get_safe('planID') : null;
     <title>Workouts</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../../css/styles.css"> <!-- Include your external CSS file -->
     <script>
         function handleUnitChange() {
             const unit = document.getElementById('unit').value;
@@ -163,7 +171,7 @@ $selectedPlanID = isset($_GET['planID']) ? get_safe('planID') : null;
             </div>
         </form>
         <div class="table-container">
-            <table id="workoutTable" class="table table-striped">
+            <table id="workoutTable" class="table table-striped table-responsive">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -177,7 +185,7 @@ $selectedPlanID = isset($_GET['planID']) ? get_safe('planID') : null;
                     </tr>
                 </thead>
                 <tbody id="workoutTableBody">
-                    <?php displayWorkouts($selectedPlanID, $selectedUnit); ?>
+                    <?php displayWorkouts($selectedPlanID, $selectedUnit, $strategies); ?>
                 </tbody>
             </table>
         </div>

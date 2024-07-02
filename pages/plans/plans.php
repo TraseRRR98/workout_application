@@ -71,11 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addPlan'])) {
     $dayOfWeek = get_safe('dayOfWeek');
     addPlan($name, $description, $dayOfWeek);
 }
-
-if (isset($_GET['deleteID'])) {
-    $ID = get_safe('deleteID');
-    deletePlan($ID);
-}
 ?>
 <!------------------------------------------------------------------------------------>
 <<!DOCTYPE html>
