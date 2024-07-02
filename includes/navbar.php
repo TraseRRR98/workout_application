@@ -21,7 +21,7 @@
                 <a class="nav-link text-white" href="/workout_application/pages/plans/plans.php">Plans</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white" href="/workout_application/plans.php">Workouts</a>
+                <a class="nav-link text-white" href="/workout_application/pages/workouts/workouts.php">Workouts</a>
             </li>
         </ul>
     </div>
