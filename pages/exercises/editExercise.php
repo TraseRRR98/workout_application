@@ -50,7 +50,6 @@ $exercise = getExercise(get_safe('ID'));
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body class="display-background">
-    <?php include '../../includes/header.php'; ?>
     <br>
     <div class="container">
         <h1>Edit Exercise</h1>

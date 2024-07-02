@@ -36,8 +36,8 @@ function displayPlanExercises($planID) {
 function addWorkout($planID, $exerciseID, $sets, $reps, $weight, $progressiveOverloadingStrategy) {
     global $conn;
 
-    $stmt = $conn->prepare("INSERT INTO workouts (Plan_ID, Exercise_ID, Sets, Reps, Weight, Progressive_Overloading_Strategy) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("iiiidi", $planID, $exerciseID, $sets, $reps, $weight, $progressiveOverloadingStrategy);
+    $stmt = $conn->prepare("INSERT INTO workouts (Plan_ID, Exercise_ID, Sets, Reps, Weight, Progressive_Overloading_Strategy, Initial_Sets, Initial_Reps, Initial_Weight) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("iiiidiiii", $planID, $exerciseID, $sets, $reps, $weight, $progressiveOverloadingStrategy, $sets, $reps, $weight);
 
     if ($stmt->execute()) {
         echo "Workout added successfully.";
@@ -58,6 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addWorkout'])) {
     $weight = get_safe('weight');
     $progressiveOverloadingStrategy = get_safe('progressiveOverloadingStrategy');
     addWorkout($planID, $exerciseID, $sets, $reps, $weight, $progressiveOverloadingStrategy);
+    header('Location: addWorkout.php?planID=' . $planID);
+    exit;
 }
 ?>
 

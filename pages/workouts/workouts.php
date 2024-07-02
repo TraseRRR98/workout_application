@@ -79,6 +79,16 @@ function displayWorkouts($planID = null, $unit = 'lbs') {
 function deleteWorkout($ID) {
     global $conn;
 
+    // Delete related workout sessions
+    $stmt = $conn->prepare("DELETE FROM workout_sessions WHERE Workout_ID = ?");
+    $stmt->bind_param("i", $ID);
+    if (!$stmt->execute()) {
+        echo "Error deleting workout sessions: " . $conn->error;
+        return;
+    }
+    $stmt->close();
+
+    // Delete workout
     $stmt = $conn->prepare("DELETE FROM workouts WHERE ID = ?");
     $stmt->bind_param("i", $ID);
 

@@ -15,6 +15,7 @@ function applyProgressiveOverload($workoutID) {
     $newWeight = $workout['Weight'];
     $newReps = $workout['Reps'];
     $newSets = $workout['Sets'];
+    $initialReps = $workout['Initial_Reps'];
     $strategy = $workout['Progressive_Overloading_Strategy'];
 
     switch ($strategy) {
@@ -26,8 +27,8 @@ function applyProgressiveOverload($workoutID) {
             break;
         case 3: // Reps Increase
             $newReps += 1; // Increase reps by 1
-            if ($newReps > 12) { // Reset reps and increase weight if reps exceed 12
-                $newReps = 8;
+            if ($newReps > 12) { // Reset reps to initial value and increase weight if reps exceed 12
+                $newReps = $initialReps;
                 $newWeight += 5;
             }
             break;
