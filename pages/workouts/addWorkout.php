@@ -5,14 +5,14 @@ require_once '../../includes/header.php';
 require_once '../../includes/db_connect.php';
 require_once '../../includes/accesibles.php';
 
-function displayPlanExercises($planID) {
+function displayPlanExercises($planID, $userID) {
     global $conn;
     $sql = "SELECT w.ID, e.Name as Exercise_Name, w.Sets, w.Reps, w.Weight, w.Progressive_Overloading_Strategy 
             FROM workouts w 
             JOIN exercises e ON w.Exercise_ID = e.ID 
-            WHERE w.Plan_ID = ?";
+            WHERE w.Plan_ID = ? AND w.User_ID = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $planID);
+    $stmt->bind_param("ii", $planID, $userID);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -35,11 +35,11 @@ function displayPlanExercises($planID) {
     }
 }
 
-function addWorkout($planID, $exerciseID, $sets, $reps, $weight, $progressiveOverloadingStrategy) {
+function addWorkout($planID, $exerciseID, $sets, $reps, $weight, $progressiveOverloadingStrategy, $userID) {
     global $conn;
 
-    $stmt = $conn->prepare("INSERT INTO workouts (Plan_ID, Exercise_ID, Sets, Reps, Weight, Progressive_Overloading_Strategy, Initial_Sets, Initial_Reps, Initial_Weight) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("iiiidiiii", $planID, $exerciseID, $sets, $reps, $weight, $progressiveOverloadingStrategy, $sets, $reps, $weight);
+    $stmt = $conn->prepare("INSERT INTO workouts (Plan_ID, Exercise_ID, Sets, Reps, Initial_Reps, Weight, Progressive_Overloading_Strategy, User_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("iiiidiii", $planID, $exerciseID, $sets, $reps, $reps, $weight, $progressiveOverloadingStrategy, $userID);
 
     if ($stmt->execute()) {
         echo "Workout added successfully.";
@@ -51,6 +51,7 @@ function addWorkout($planID, $exerciseID, $sets, $reps, $weight, $progressiveOve
 }
 
 $selectedPlanID = isset($_GET['planID']) ? get_safe('planID') : null;
+$userID = $_SESSION['userID'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addWorkout'])) {
     $planID = get_safe('planID');
@@ -59,9 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addWorkout'])) {
     $reps = get_safe('reps');
     $weight = get_safe('weight');
     $progressiveOverloadingStrategy = get_safe('progressiveOverloadingStrategy');
-    addWorkout($planID, $exerciseID, $sets, $reps, $weight, $progressiveOverloadingStrategy);
-    header('Location: addWorkout.php?planID=' . $planID);
-    exit;
+    addWorkout($planID, $exerciseID, $sets, $reps, $weight, $progressiveOverloadingStrategy, $userID);
 }
 ?>
 
@@ -90,8 +89,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addWorkout'])) {
                 <select class="form-control w-100 mb-2 mb-md-0 mr-md-2" id="planID" name="planID" onchange="handlePlanChange()" required>
                     <option value="">Select Plan</option>
                     <?php
-                    $planQuery = "SELECT ID, Name FROM plans";
-                    $planResult = $conn->query($planQuery);
+                    $planQuery = "SELECT ID, Name FROM plans WHERE User_ID = ?";
+                    $stmt = $conn->prepare($planQuery);
+                    $stmt->bind_param("i", $userID);
+                    $stmt->execute();
+                    $planResult = $stmt->get_result();
                     while ($planRow = $planResult->fetch_assoc()) {
                         $selected = ($planRow['ID'] == $selectedPlanID) ? 'selected' : '';
                         echo "<option value='" . htmlspecialchars($planRow['ID'], ENT_QUOTES, 'UTF-8') . "' $selected>" . htmlspecialchars($planRow['Name'], ENT_QUOTES, 'UTF-8') . "</option>";
@@ -149,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addWorkout'])) {
                     </tr>
                 </thead>
                 <tbody id="planExercisesTableBody">
-                    <?php displayPlanExercises($selectedPlanID); ?>
+                    <?php displayPlanExercises($selectedPlanID, $userID); ?>
                 </tbody>
             </table>
         </div>

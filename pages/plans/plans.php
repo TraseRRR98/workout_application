@@ -1,16 +1,19 @@
 <?php
-include '../../includes/session.php';
+require_once '../../includes/session.php';
 check_login();
-?>
-<?php
-include '../../includes/header.php';
-include '../../includes/db_connect.php';
-include '../../includes/accesibles.php';
-///////////////////////////////////////////////////////////////////////////////////////
-function displayPlans() {
+require_once '../../includes/header.php';
+require_once '../../includes/db_connect.php';
+require_once '../../includes/accesibles.php';
+
+$userID = $_SESSION['userID'];
+
+function displayPlans($userID) {
     global $conn;
-    $sql = "SELECT ID, Name, Description, Day_of_Week FROM plans";
-    $result = $conn->query($sql);
+    $sql = "SELECT ID, Name, Description, Day_of_Week FROM plans WHERE User_ID = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $userID);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if (!$result) {
         die('Could not get data: ' . mysqli_error($conn));
@@ -33,7 +36,7 @@ function displayPlans() {
         echo "<tr><td colspan='5'>No results found</td></tr>";
     }
 }
-///////////////////////////////////////////////////////////////////////////////////////
+
 function deletePlan($ID) {
     global $conn;
 
@@ -53,12 +56,12 @@ if (isset($_GET['deleteID'])) {
     $ID = get_safe('deleteID');
     deletePlan($ID);
 }
-///////////////////////////////////////////////////////////////////////////////////////
-function addPlan($name, $description, $dayOfWeek) {
+
+function addPlan($name, $description, $dayOfWeek, $userID) {
     global $conn;
 
-    $stmt = $conn->prepare("INSERT INTO plans (Name, Description, Day_of_Week) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $name, $description, $dayOfWeek);
+    $stmt = $conn->prepare("INSERT INTO plans (Name, Description, Day_of_Week, User_ID) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("sssi", $name, $description, $dayOfWeek, $userID);
 
     if ($stmt->execute()) {
         echo "Plan added successfully.";
@@ -73,11 +76,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addPlan'])) {
     $name = get_safe('name');
     $description = get_safe('description');
     $dayOfWeek = get_safe('dayOfWeek');
-    addPlan($name, $description, $dayOfWeek);
+    addPlan($name, $description, $dayOfWeek, $userID);
 }
 ?>
 <!------------------------------------------------------------------------------------>
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -136,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addPlan'])) {
                     </tr>
                 </thead>
                 <tbody id="planTableBody">
-                    <?php displayPlans(); ?>
+                    <?php displayPlans($userID); ?>
                 </tbody>
             </table>
         </div>
@@ -150,5 +153,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addPlan'])) {
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-</html
-<!------------------------------------------------------------------------------------>
+</html>

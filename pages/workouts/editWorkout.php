@@ -15,18 +15,20 @@ function getWorkout($ID) {
     return $result->fetch_assoc();
 }
 
-function updateWorkout($ID, $planID, $exerciseID, $sets, $reps, $weight, $progressiveOverloadingStrategy) {
+function updateWorkout($workoutID, $sets, $reps, $weight, $progressiveOverloadingStrategy, $userID) {
     global $conn;
-    $stmt = $conn->prepare("UPDATE workouts SET Plan_ID = ?, Exercise_ID = ?, Sets = ?, Reps = ?, Weight = ?, Progressive_Overloading_Strategy = ? WHERE ID = ?");
-    $stmt->bind_param("iiiidii", $planID, $exerciseID, $sets, $reps, $weight, $progressiveOverloadingStrategy, $ID);
+
+    $stmt = $conn->prepare("UPDATE workouts SET Sets = ?, Reps = ?, Initial_Reps = ?, Weight = ?, Progressive_Overloading_Strategy = ? WHERE ID = ? AND User_ID = ?");
+    $stmt->bind_param("iiidiii", $sets, $reps, $reps, $weight, $progressiveOverloadingStrategy, $workoutID, $userID);
+
     if ($stmt->execute()) {
         echo "Workout updated successfully.";
     } else {
         echo "Error updating workout: " . $conn->error;
     }
+
     $stmt->close();
 }
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updateWorkout'])) {
     $ID = get_safe('ID');
     $planID = get_safe('planID');

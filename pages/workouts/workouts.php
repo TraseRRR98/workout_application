@@ -12,22 +12,24 @@ $strategies = [
     3 => 'Reps Increase'
 ];
 
+$userID = $_SESSION['userID'];
+
 if (isset($_GET['applyOverload'])) {
     $workoutID = get_safe('workoutID');
     echo "Applying overload to workout ID: $workoutID"; // Debugging output
     applyProgressiveOverload($workoutID);
 
     // Fetch the updated workout details
-    $sql = "SELECT * FROM workouts WHERE ID = ?";
+    $sql = "SELECT * FROM workouts WHERE ID = ? AND User_ID = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $workoutID);
+    $stmt->bind_param("ii", $workoutID, $userID);
     $stmt->execute();
     $updatedWorkout = $stmt->get_result()->fetch_assoc();
     $stmt->close();
 
     // Insert a new record into the workout_sessions table to keep track of the history
-    $stmt = $conn->prepare("INSERT INTO workout_sessions (Workout_ID, Date, Weight, Reps, Sets, Notes) VALUES (?, NOW(), ?, ?, ?, 'Applied overload')");
-    $stmt->bind_param("idii", $workoutID, $updatedWorkout['Weight'], $updatedWorkout['Reps'], $updatedWorkout['Sets']);
+    $stmt = $conn->prepare("INSERT INTO workout_sessions (Workout_ID, Date, Weight, Reps, Sets, Notes, User_ID) VALUES (?, NOW(), ?, ?, ?, 'Applied overload', ?)");
+    $stmt->bind_param("idiii", $workoutID, $updatedWorkout['Weight'], $updatedWorkout['Reps'], $updatedWorkout['Sets'], $userID);
     if ($stmt->execute()) {
         echo "Workout session recorded successfully.";
     } else {
@@ -38,22 +40,25 @@ if (isset($_GET['applyOverload'])) {
 
 $selectedUnit = isset($_GET['unit']) ? get_safe('unit') : 'lbs'; // Default to lbs if no unit is selected
 
-function displayWorkouts($planID = null, $unit = 'lbs', $strategies) {
+function displayWorkouts($userID, $planID = null, $unit = 'lbs', $strategies) {
     global $conn;
     $sql = "SELECT w.ID, p.Name as Plan_Name, e.Name as Exercise_Name, w.Sets, w.Reps, w.Weight, w.Progressive_Overloading_Strategy 
             FROM workouts w 
             JOIN plans p ON w.Plan_ID = p.ID 
-            JOIN exercises e ON w.Exercise_ID = e.ID";
+            JOIN exercises e ON w.Exercise_ID = e.ID
+            WHERE w.User_ID = ?";
     
     if ($planID !== null) {
-        $sql .= " WHERE w.Plan_ID = ?";
+        $sql .= " AND w.Plan_ID = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $planID);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $stmt->bind_param("ii", $userID, $planID);
     } else {
-        $result = $conn->query($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $userID);
     }
+    
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if (!$result) {
         die('Could not get data: ' . mysqli_error($conn));
@@ -98,8 +103,8 @@ function deleteWorkout($ID) {
     $stmt->close();
 
     // Delete workout
-    $stmt = $conn->prepare("DELETE FROM workouts WHERE ID = ?");
-    $stmt->bind_param("i", $ID);
+    $stmt = $conn->prepare("DELETE FROM workouts WHERE ID = ? AND User_ID = ?");
+    $stmt->bind_param("ii", $ID, $_SESSION['userID']);
 
     if ($stmt->execute()) {
         echo "Workout deleted successfully.";
@@ -155,12 +160,16 @@ $selectedPlanID = isset($_GET['planID']) ? get_safe('planID') : null;
                 <select class="form-control" id="planID" name="planID" onchange="handlePlanChange()">
                     <option value="">Select Plan</option>
                     <?php
-                    $planQuery = "SELECT ID, Name FROM plans";
-                    $planResult = $conn->query($planQuery);
+                    $planQuery = "SELECT ID, Name FROM plans WHERE User_ID = ?";
+                    $stmt = $conn->prepare($planQuery);
+                    $stmt->bind_param("i", $userID);
+                    $stmt->execute();
+                    $planResult = $stmt->get_result();
                     while ($planRow = $planResult->fetch_assoc()) {
                         $selected = ($planRow['ID'] == $selectedPlanID) ? 'selected' : '';
                         echo "<option value='" . htmlspecialchars($planRow['ID'], ENT_QUOTES, 'UTF-8') . "' $selected>" . htmlspecialchars($planRow['Name'], ENT_QUOTES, 'UTF-8') . "</option>";
                     }
+                    $stmt->close();
                     ?>
                 </select>
             </div>
@@ -187,7 +196,7 @@ $selectedPlanID = isset($_GET['planID']) ? get_safe('planID') : null;
                     </tr>
                 </thead>
                 <tbody id="workoutTableBody">
-                    <?php displayWorkouts($selectedPlanID, $selectedUnit, $strategies); ?>
+                    <?php displayWorkouts($userID, $selectedPlanID, $selectedUnit, $strategies); ?>
                 </tbody>
             </table>
         </div>

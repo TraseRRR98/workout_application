@@ -20,6 +20,7 @@ function applyProgressiveOverload($workoutID) {
     $newSets = $workout['Sets'];
     $initialReps = $workout['Initial_Reps'];
     $strategy = $workout['Progressive_Overloading_Strategy'];
+    $userID = $workout['User_ID'];
 
     switch ($strategy) {
         case 1: // Percentage Increase
@@ -40,8 +41,8 @@ function applyProgressiveOverload($workoutID) {
     echo "Updating workout ID: $workoutID with Weight: $newWeight, Reps: $newReps, Sets: $newSets"; // Debugging output
 
     // Update the workout with new weight, reps, and sets
-    $stmt = $conn->prepare("UPDATE workouts SET Weight = ?, Reps = ?, Sets = ? WHERE ID = ?");
-    $stmt->bind_param("diii", $newWeight, $newReps, $newSets, $workoutID);
+    $stmt = $conn->prepare("UPDATE workouts SET Weight = ?, Reps = ?, Sets = ? WHERE ID = ? AND User_ID = ?");
+    $stmt->bind_param("diiii", $newWeight, $newReps, $newSets, $workoutID, $userID);
     if ($stmt->execute()) {
         echo "Workout updated successfully.";
     } else {

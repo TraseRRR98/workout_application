@@ -1,27 +1,27 @@
 <?php
-include '../../includes/session.php';
+require_once '../../includes/session.php';
 check_login();
-?>
-<?php
-include '../../includes/header.php';
-include '../../includes/db_connect.php';
-include '../../includes/accesibles.php';
-///////////////////////////////////////////////////////////////////////////////////////
-function getPlan($ID) {
+require_once '../../includes/header.php';
+require_once '../../includes/db_connect.php';
+require_once '../../includes/accesibles.php';
+
+$userID = $_SESSION['userID'];
+
+function getPlan($ID, $userID) {
     global $conn;
-    $stmt = $conn->prepare("SELECT Name, Description, Day_of_Week FROM plans WHERE ID = ?");
-    $stmt->bind_param("i", $ID);
+    $stmt = $conn->prepare("SELECT Name, Description, Day_of_Week FROM plans WHERE ID = ? AND User_ID = ?");
+    $stmt->bind_param("ii", $ID, $userID);
     $stmt->execute();
     $stmt->bind_result($name, $description, $dayOfWeek);
     $stmt->fetch();
     $stmt->close();
     return ['name' => $name, 'description' => $description, 'dayOfWeek' => $dayOfWeek];
 }
-///////////////////////////////////////////////////////////////////////////////////////
-function updatePlan($ID, $name, $description, $dayOfWeek) {
+
+function updatePlan($ID, $name, $description, $dayOfWeek, $userID) {
     global $conn;
-    $stmt = $conn->prepare("UPDATE plans SET Name = ?, Description = ?, Day_of_Week = ? WHERE ID = ?");
-    $stmt->bind_param("sssi", $name, $description, $dayOfWeek, $ID);
+    $stmt = $conn->prepare("UPDATE plans SET Name = ?, Description = ?, Day_of_Week = ? WHERE ID = ? AND User_ID = ?");
+    $stmt->bind_param("sssii", $name, $description, $dayOfWeek, $ID, $userID);
 
     if ($stmt->execute()) {
         echo "Plan updated successfully.";
@@ -37,12 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updatePlan'])) {
     $name = get_safe('name');
     $description = get_safe('description');
     $dayOfWeek = get_safe('dayOfWeek');
-    updatePlan($ID, $name, $description, $dayOfWeek);
+    updatePlan($ID, $name, $description, $dayOfWeek, $userID);
     header('Location: plans.php');
     exit;
 }
 
-$plan = getPlan(get_safe('ID'));
+$plan = getPlan(get_safe('ID'), $userID);
 ?>
 <!------------------------------------------------------------------------------------>
 <!DOCTYPE html>
@@ -93,4 +93,3 @@ $plan = getPlan(get_safe('ID'));
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
-<!------------------------------------------------------------------------------------>

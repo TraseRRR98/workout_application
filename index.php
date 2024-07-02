@@ -1,10 +1,8 @@
 <?php
-include 'includes/session.php';
+require_once 'includes/session.php'; // Ensure session management is consistent
 check_login();
-?>
-<?php
-include 'includes/db_connect.php';
-include 'includes/header.php';
+require_once 'includes/header.php';
+require_once 'includes/db_connect.php';
 ?>
 
 <div class="container">
@@ -17,7 +15,7 @@ include 'includes/header.php';
 </div>
 
 <?php
-include 'includes/footer.php';
+require_once 'includes/footer.php';
 ?>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

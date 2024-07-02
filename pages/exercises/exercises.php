@@ -1,11 +1,9 @@
 <?php
-include '../../includes/session.php';
+require_once '../../includes/session.php';
 check_login();
-?>
-<?php
-include '../../includes/header.php';
-include '../../includes/db_connect.php';
-include '../../includes/accesibles.php';
+require_once '../../includes/header.php';
+require_once '../../includes/db_connect.php';
+require_once '../../includes/accesibles.php';
 ///////////////////////////////////////////////////////////////////////////////////////
 function displayExercises() {
     global $conn;

@@ -5,15 +5,17 @@ require_once '../../includes/header.php';
 require_once '../../includes/db_connect.php';
 require_once '../../includes/accesibles.php';
 
+$userID = $_SESSION['userID'];
+
 function getWorkoutDetails($workoutID) {
     global $conn;
     $sql = "SELECT p.Name as Plan_Name, e.Name as Exercise_Name
             FROM workouts w
             JOIN plans p ON w.Plan_ID = p.ID
             JOIN exercises e ON w.Exercise_ID = e.ID
-            WHERE w.ID = ?";
+            WHERE w.ID = ? AND w.User_ID = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $workoutID);
+    $stmt->bind_param("ii", $workoutID, $userID);
     $stmt->execute();
     $stmt->bind_result($planName, $exerciseName);
     $stmt->fetch();
@@ -21,13 +23,16 @@ function getWorkoutDetails($workoutID) {
     return ['planName' => $planName, 'exerciseName' => $exerciseName];
 }
 
-function displayWorkoutHistory($workoutID) {
+function displayWorkoutHistory($workoutID, $userID) {
     global $conn;
-    $sql = "SELECT ws.ID, ws.Date, ws.Weight, ws.Reps, ws.Sets, ws.Notes
+    $sql = "SELECT ws.ID, ws.Date, ws.Weight, ws.Reps, ws.Sets, ws.Notes, p.Name as Plan_Name, e.Name as Exercise_Name 
             FROM workout_sessions ws
-            WHERE ws.Workout_ID = ?";
+            JOIN workouts w ON ws.Workout_ID = w.ID
+            JOIN plans p ON w.Plan_ID = p.ID
+            JOIN exercises e ON w.Exercise_ID = e.ID
+            WHERE ws.Workout_ID = ? AND w.User_ID = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $workoutID);
+    $stmt->bind_param("ii", $workoutID, $userID);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -38,24 +43,28 @@ function displayWorkoutHistory($workoutID) {
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             echo "<tr>
+                    <td>" . htmlspecialchars($row['Plan_Name'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td>" . htmlspecialchars($row['Exercise_Name'], ENT_QUOTES, 'UTF-8') . "</td>
                     <td>" . htmlspecialchars($row['Date'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($row['Weight'], ENT_QUOTES, 'UTF-8') . " lbs</td>
+                    <td>" . htmlspecialchars($row['Weight'], ENT_QUOTES, 'UTF-8') . "</td>
                     <td>" . htmlspecialchars($row['Reps'], ENT_QUOTES, 'UTF-8') . "</td>
                     <td>" . htmlspecialchars($row['Sets'], ENT_QUOTES, 'UTF-8') . "</td>
                     <td>" . htmlspecialchars($row['Notes'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td><a href='workout_history.php?workoutID=" . htmlspecialchars($workoutID, ENT_QUOTES, 'UTF-8') . "&deleteHistoryID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-delete btn btn-danger btn-sm' onclick='return confirm(\"Are you sure you want to delete this history entry?\");'><i class='fas fa-trash-alt'></i> Delete</a></td>
+                    <td class='sessionTableActions'>
+                        <a href='?deleteHistoryID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "&workoutID=" . htmlspecialchars($workoutID, ENT_QUOTES, 'UTF-8') . "' class='button button-delete' onclick='return confirm(\"Are you sure you want to delete this session?\");'><i class='fas fa-trash-alt'></i> Delete</a>
+                    </td>
                   </tr>";
         }
     } else {
-        echo "<tr><td colspan='6'>No history found for this workout</td></tr>";
+        echo "<tr><td colspan='8'>No results found</td></tr>";
     }
 }
 
-function deleteHistoryEntry($historyID) {
+function deleteHistoryEntry($historyID, $userID) {
     global $conn;
 
-    $stmt = $conn->prepare("DELETE FROM workout_sessions WHERE ID = ?");
-    $stmt->bind_param("i", $historyID);
+    $stmt = $conn->prepare("DELETE FROM workout_sessions WHERE ID = ? AND User_ID = ?");
+    $stmt->bind_param("ii", $historyID, $userID);
 
     if ($stmt->execute()) {
         echo "History entry deleted successfully.";
@@ -70,7 +79,7 @@ $workoutID = isset($_GET['workoutID']) ? get_safe('workoutID') : null;
 $historyID = isset($_GET['deleteHistoryID']) ? get_safe('deleteHistoryID') : null;
 
 if ($historyID) {
-    deleteHistoryEntry($historyID);
+    deleteHistoryEntry($historyID, $userID);
 }
 
 $workoutDetails = $workoutID ? getWorkoutDetails($workoutID) : null;
@@ -99,6 +108,8 @@ $workoutDetails = $workoutID ? getWorkoutDetails($workoutID) : null;
             <table id="workoutHistoryTable" class="table table-striped">
                 <thead>
                     <tr>
+                        <th>Plan</th>
+                        <th>Exercise</th>
                         <th>Date</th>
                         <th>Weight</th>
                         <th>Reps</th>
@@ -110,9 +121,9 @@ $workoutDetails = $workoutID ? getWorkoutDetails($workoutID) : null;
                 <tbody id="workoutHistoryTableBody">
                     <?php
                     if ($workoutID) {
-                        displayWorkoutHistory($workoutID);
+                        displayWorkoutHistory($workoutID, $userID);
                     } else {
-                        echo "<tr><td colspan='6'>Invalid workout ID</td></tr>";
+                        echo "<tr><td colspan='8'>Invalid workout ID</td></tr>";
                     }
                     ?>
                 </tbody>
