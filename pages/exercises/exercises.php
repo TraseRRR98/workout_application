@@ -81,21 +81,21 @@ if (isset($_GET['deleteID'])) {
     <div class="container">
         <h1>Exercises List</h1>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6 mb-3">
                 <form action="exercises.php" method="get" class="form-inline">
                     <label for="searchBar" class="sr-only">Search Exercises:</label>
-                    <input type="text" id="searchBar" name="searchBar" class="form-control mb-2 mr-sm-2" placeholder="Search Exercises" required>
+                    <input type="text" id="searchBar" name="searchBar" class="form-control w-100 mb-2 mb-md-0" placeholder="Search Exercises" required>
                 </form>
             </div>
-            <div class="col-md-6">
+            <div class="col-12 col-md-6 mb-3">
                 <form action="exercises.php" method="post" class="form-inline">
                     <div class="form-group mb-2">
                         <label for="name" class="sr-only">Exercise Name:</label>
-                        <input type="text" class="form-control mr-sm-2" id="name" name="name" placeholder="Exercise Name" required>
+                        <input type="text" class="form-control w-100 mb-2 mb-md-0 mr-md-2" id="name" name="name" placeholder="Exercise Name" required>
                     </div>
                     <div class="form-group mb-2">
                         <label for="muscleGroup" class="sr-only">Muscle Group:</label>
-                        <input type="text" class="form-control mr-sm-2" id="muscleGroup" name="muscleGroup" placeholder="Muscle Group" required>
+                        <input type="text" class="form-control w-100 mb-2 mb-md-0 mr-md-2" id="muscleGroup" name="muscleGroup" placeholder="Muscle Group" required>
                     </div>
                     <button type="submit" class="btn btn-primary mb-2" name="addExercise">Add Exercise</button>
                 </form>
@@ -128,4 +128,5 @@ if (isset($_GET['deleteID'])) {
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="../../js/searchBarFunctionality.js"></script>
 </body>
+</html>
 <!------------------------------------------------------------------------------------>
