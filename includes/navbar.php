@@ -9,10 +9,10 @@
                 <a class="nav-link text-white" href="/workout_application/index.php">Home</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white" href="/workout_application/login.php">Login</a>
+                <a class="nav-link text-white" href="/workout_application/pages/login/login.php">Login</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white" href="/workout_application/register.php">Register</a>
+                <a class="nav-link text-white" href="/workout_application/pages/register/register.php">Register</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-white" href="/workout_application/pages/exercises/exercises.php">Exercises</a>

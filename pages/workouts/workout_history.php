@@ -21,7 +21,7 @@ function getWorkoutDetails($workoutID) {
 
 function displayWorkoutHistory($workoutID) {
     global $conn;
-    $sql = "SELECT ws.Date, ws.Weight, ws.Reps, ws.Sets, ws.Notes
+    $sql = "SELECT ws.ID, ws.Date, ws.Weight, ws.Reps, ws.Sets, ws.Notes
             FROM workout_sessions ws
             WHERE ws.Workout_ID = ?";
     $stmt = $conn->prepare($sql);
@@ -41,14 +41,36 @@ function displayWorkoutHistory($workoutID) {
                     <td>" . htmlspecialchars($row['Reps'], ENT_QUOTES, 'UTF-8') . "</td>
                     <td>" . htmlspecialchars($row['Sets'], ENT_QUOTES, 'UTF-8') . "</td>
                     <td>" . htmlspecialchars($row['Notes'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td><a href='workout_history.php?workoutID=" . htmlspecialchars($workoutID, ENT_QUOTES, 'UTF-8') . "&deleteHistoryID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-delete btn btn-danger btn-sm' onclick='return confirm(\"Are you sure you want to delete this history entry?\");'><i class='fas fa-trash-alt'></i> Delete</a></td>
                   </tr>";
         }
     } else {
-        echo "<tr><td colspan='5'>No history found for this workout</td></tr>";
+        echo "<tr><td colspan='6'>No history found for this workout</td></tr>";
     }
 }
 
+function deleteHistoryEntry($historyID) {
+    global $conn;
+
+    $stmt = $conn->prepare("DELETE FROM workout_sessions WHERE ID = ?");
+    $stmt->bind_param("i", $historyID);
+
+    if ($stmt->execute()) {
+        echo "History entry deleted successfully.";
+    } else {
+        echo "Error deleting history entry: " . $conn->error;
+    }
+
+    $stmt->close();
+}
+
 $workoutID = isset($_GET['workoutID']) ? get_safe('workoutID') : null;
+$historyID = isset($_GET['deleteHistoryID']) ? get_safe('deleteHistoryID') : null;
+
+if ($historyID) {
+    deleteHistoryEntry($historyID);
+}
+
 $workoutDetails = $workoutID ? getWorkoutDetails($workoutID) : null;
 ?>
 
@@ -80,6 +102,7 @@ $workoutDetails = $workoutID ? getWorkoutDetails($workoutID) : null;
                         <th>Reps</th>
                         <th>Sets</th>
                         <th>Notes</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="workoutHistoryTableBody">
@@ -87,7 +110,7 @@ $workoutDetails = $workoutID ? getWorkoutDetails($workoutID) : null;
                     if ($workoutID) {
                         displayWorkoutHistory($workoutID);
                     } else {
-                        echo "<tr><td colspan='5'>Invalid workout ID</td></tr>";
+                        echo "<tr><td colspan='6'>Invalid workout ID</td></tr>";
                     }
                     ?>
                 </tbody>

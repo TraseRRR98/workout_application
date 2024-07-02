@@ -1,10 +1,3 @@
-/* public/css/styles.css */
-
-footer {
-    padding: 1rem 0;
-    background-color: #f8f9fa;
-}
-
 @media (max-width: 767px) {
     .table-container {
         overflow-x: auto;
