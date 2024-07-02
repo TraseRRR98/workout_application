@@ -1,39 +1,21 @@
 <?php
 include '../../includes/db_connect.php';
 
-function getLatestSession($workoutID) {
-    global $conn;
-    $sql = "SELECT * FROM workout_sessions WHERE Workout_ID = ? ORDER BY Date DESC LIMIT 1";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $workoutID);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    return $result->fetch_assoc();
-}
-
 function applyProgressiveOverload($workoutID) {
     global $conn;
 
-    $latestSession = getLatestSession($workoutID);
-    if (!$latestSession) {
-        // Fetch initial workout details if no sessions are found
-        $sql = "SELECT * FROM workouts WHERE ID = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $workoutID);
-        $stmt->execute();
-        $workout = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
+    // Fetch initial workout details from the workouts table
+    $sql = "SELECT * FROM workouts WHERE ID = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $workoutID);
+    $stmt->execute();
+    $workout = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
 
-        $newWeight = $workout['Weight'];
-        $newReps = $workout['Reps'];
-        $newSets = $workout['Sets'];
-        $strategy = $workout['Progressive_Overloading_Strategy'];
-    } else {
-        $strategy = $latestSession['Progressive_Overloading_Strategy'];
-        $newWeight = $latestSession['Weight'];
-        $newReps = $latestSession['Reps'];
-        $newSets = $latestSession['Sets'];
-    }
+    $newWeight = $workout['Weight'];
+    $newReps = $workout['Reps'];
+    $newSets = $workout['Sets'];
+    $strategy = $workout['Progressive_Overloading_Strategy'];
 
     switch ($strategy) {
         case 1: // Percentage Increase

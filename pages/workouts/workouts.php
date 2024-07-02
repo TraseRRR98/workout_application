@@ -2,11 +2,30 @@
 include '../../includes/header.php';
 include '../../includes/db_connect.php';
 include '../../includes/accesibles.php';
-include 'progressive_overload.php';  // Include the progressive overloading logic
+include '../../pages/workouts/progressive_overload.php';  // Include the progressive overloading logic
 
 if (isset($_GET['applyOverload'])) {
     $workoutID = get_safe('workoutID');
+    echo "Applying overload to workout ID: $workoutID"; // Debugging output
     applyProgressiveOverload($workoutID);
+
+    // Fetch the updated workout details
+    $sql = "SELECT * FROM workouts WHERE ID = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $workoutID);
+    $stmt->execute();
+    $updatedWorkout = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    // Insert a new record into the workout_sessions table to keep track of the history
+    $stmt = $conn->prepare("INSERT INTO workout_sessions (Workout_ID, Date, Weight, Reps, Sets, Notes) VALUES (?, NOW(), ?, ?, ?, 'Applied overload')");
+    $stmt->bind_param("idii", $workoutID, $updatedWorkout['Weight'], $updatedWorkout['Reps'], $updatedWorkout['Sets']);
+    if ($stmt->execute()) {
+        echo "Workout session recorded successfully.";
+    } else {
+        echo "Error recording workout session: " . $conn->error;
+    }
+    $stmt->close();
 }
 
 $selectedUnit = isset($_GET['unit']) ? get_safe('unit') : 'lbs'; // Default to lbs if no unit is selected
