@@ -8,21 +8,27 @@
             <li class="nav-item">
                 <a class="nav-link text-white" href="/workout_application/index.php">Home</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="/workout_application/pages/login/login.php">Login</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="/workout_application/pages/register/register.php">Register</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="/workout_application/pages/exercises/exercises.php">Exercises</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="/workout_application/pages/plans/plans.php">Plans</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="/workout_application/pages/workouts/workouts.php">Workouts</a>
-            </li>
+            <?php if (isset($_SESSION['userID'])): ?>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/workout_application/pages/exercises/exercises.php">Exercises</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/workout_application/pages/plans/plans.php">Plans</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/workout_application/pages/workouts/workouts.php">Workouts</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/workout_application/pages/logout.php">Logout</a>
+                </li>
+            <?php else: ?>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/workout_application/pages/login/login.php">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/workout_application/pages/register/register.php">Register</a>
+                </li>
+            <?php endif; ?>
         </ul>
     </div>
 </nav>

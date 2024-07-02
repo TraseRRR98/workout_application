@@ -1,8 +1,10 @@
 <?php
-include '../../includes/header.php';
-include '../../includes/db_connect.php';
-include '../../includes/accesibles.php';
-include '../../pages/workouts/progressive_overload.php';  // Include the progressive overloading logic
+require_once '../../includes/session.php';
+check_login();
+require_once '../../includes/header.php';
+require_once '../../includes/db_connect.php';
+require_once '../../includes/accesibles.php';
+require_once '../../pages/workouts/progressive_overload.php';  // Include the progressive overloading logic
 
 $strategies = [
     1 => 'Percentage Increase',

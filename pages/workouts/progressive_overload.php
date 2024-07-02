@@ -1,5 +1,8 @@
 <?php
-include '../../includes/db_connect.php';
+require_once '../../includes/session.php';
+check_login();
+require_once '../../includes/db_connect.php';
+require_once '../../includes/accesibles.php';
 
 function applyProgressiveOverload($workoutID) {
     global $conn;

@@ -1,7 +1,9 @@
 <?php
-include '../../includes/header.php';
-include '../../includes/db_connect.php';
-include '../../includes/accesibles.php';
+require_once '../../includes/session.php';
+check_login();
+require_once '../../includes/header.php';
+require_once '../../includes/db_connect.php';
+require_once '../../includes/accesibles.php';
 
 function displayPlanExercises($planID) {
     global $conn;
