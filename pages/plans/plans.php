@@ -7,11 +7,21 @@ require_once '../../includes/accesibles.php';
 
 $userID = $_SESSION['userID'];
 
-function displayPlans($userID) {
+function displayPlans($userID, $search = null) {
     global $conn;
     $sql = "SELECT ID, Name, Description, Day_of_Week FROM plans WHERE User_ID = ?";
+    
+    if ($search) {
+        $sql .= " AND (Name LIKE ? OR Description LIKE ?)";
+    }
+
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $userID);
+    if ($search) {
+        $searchParam = '%' . $search . '%';
+        $stmt->bind_param("iss", $userID, $searchParam, $searchParam);
+    } else {
+        $stmt->bind_param("i", $userID);
+    }
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -78,6 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addPlan'])) {
     $dayOfWeek = get_safe('dayOfWeek');
     addPlan($name, $description, $dayOfWeek, $userID);
 }
+
+$search = isset($_GET['searchBar']) ? get_safe('searchBar') : null;
 ?>
 <!------------------------------------------------------------------------------------>
 <!DOCTYPE html>
@@ -99,9 +111,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addPlan'])) {
                 <form action="plans.php" method="get" class="form-inline mb-3">
                     <div class="form-group mr-2">
                         <label for="searchBar" class="sr-only">Search Plans:</label>
-                        <input type="text" id="searchBar" name="searchBar" class="form-control" placeholder="Search Plans" required>
+                        <input type="text" id="searchBar" name="searchBar" class="form-control" placeholder="Search Plans" value="<?php echo isset($search) ? htmlspecialchars($search, ENT_QUOTES, 'UTF-8') : ''; ?>" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Search</button>
                 </form>
             </div>
         </div>
@@ -129,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addPlan'])) {
             <button type="submit" class="btn btn-primary mb-2" name="addPlan">Add Plan</button>
         </form>
         <div class="table-container">
-            <table id="planTable" class="table table-striped">
+            <table id="planTable" class="table table-striped table-responsive">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -140,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addPlan'])) {
                     </tr>
                 </thead>
                 <tbody id="planTableBody">
-                    <?php displayPlans($userID); ?>
+                    <?php displayPlans($userID, $search); ?>
                 </tbody>
             </table>
         </div>
@@ -153,5 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addPlan'])) {
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/workout_application/js/searchBarFunctionality1.js"></script>
 </body>
 </html>
+<!------------------------------------------------------------------------------------>

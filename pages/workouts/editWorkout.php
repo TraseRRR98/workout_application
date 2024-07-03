@@ -29,15 +29,15 @@ function updateWorkout($workoutID, $sets, $reps, $weight, $progressiveOverloadin
 
     $stmt->close();
 }
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['updateWorkout'])) {
     $ID = get_safe('ID');
-    $planID = get_safe('planID');
-    $exerciseID = get_safe('exerciseID');
     $sets = get_safe('sets');
     $reps = get_safe('reps');
     $weight = get_safe('weight');
     $progressiveOverloadingStrategy = get_safe('progressiveOverloadingStrategy');
-    updateWorkout($ID, $planID, $exerciseID, $sets, $reps, $weight, $progressiveOverloadingStrategy);
+    $userID = $_SESSION['userID'];
+    updateWorkout($ID, $sets, $reps, $weight, $progressiveOverloadingStrategy, $userID);
     header('Location: workouts.php');
     exit;
 }

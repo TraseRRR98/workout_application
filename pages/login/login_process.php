@@ -1,34 +1,37 @@
 <?php
-session_start();
+include '../../includes/header.php';
 include '../../includes/db_connect.php';
 include '../../includes/accesibles.php';
+include '../../includes/session.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = get_safe('username');
-    $password = get_safe('password');
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
 
-    // Prepare and bind
-    $stmt = $conn->prepare("SELECT ID, Password FROM users WHERE Username = ?");
-    $stmt->bind_param("s", $username);
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
     $stmt->execute();
-    $stmt->store_result();
-    
-    if ($stmt->num_rows > 0) {
-        $stmt->bind_result($userID, $hashed_password);
-        $stmt->fetch();
-        
-        // Verify the password
-        if (password_verify($password, $hashed_password)) {
-            $_SESSION['userID'] = $userID;
-            $_SESSION['username'] = $username;
-            header("Location: ../../index.php");
-            exit;
+    $result = $stmt->get_result();
+
+    if ($result->num_rows == 1) {
+        $user = $result->fetch_assoc();
+
+        if (password_verify($password, $user['password'])) {
+            if ($user['is_verified']) {
+                $_SESSION['userID'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                header('Location: ../../index.php');
+                exit;
+            } else {
+                echo "Please verify your email before logging in.";
+            }
         } else {
-            echo "Invalid password.";
+            echo "Invalid email or password.";
         }
     } else {
-        echo "Invalid username.";
+        echo "Invalid email or password.";
     }
+
     $stmt->close();
     $conn->close();
 }

@@ -13,10 +13,12 @@ $strategies = [
 ];
 
 $userID = $_SESSION['userID'];
+$message = '';
+$messageType = '';
 
 if (isset($_GET['applyOverload'])) {
     $workoutID = get_safe('workoutID');
-    echo "Applying overload to workout ID: $workoutID"; // Debugging output
+    $message .= "Applying overload to workout ID: $workoutID<br>";
     applyProgressiveOverload($workoutID);
 
     // Fetch the updated workout details
@@ -27,13 +29,17 @@ if (isset($_GET['applyOverload'])) {
     $updatedWorkout = $stmt->get_result()->fetch_assoc();
     $stmt->close();
 
+    $message .= "Updating workout ID: $workoutID with Weight: " . $updatedWorkout['Weight'] . ", Reps: " . $updatedWorkout['Reps'] . ", Sets: " . $updatedWorkout['Sets'] . "<br>";
+
     // Insert a new record into the workout_sessions table to keep track of the history
     $stmt = $conn->prepare("INSERT INTO workout_sessions (Workout_ID, Date, Weight, Reps, Sets, Notes, User_ID) VALUES (?, NOW(), ?, ?, ?, 'Applied overload', ?)");
     $stmt->bind_param("idiii", $workoutID, $updatedWorkout['Weight'], $updatedWorkout['Reps'], $updatedWorkout['Sets'], $userID);
     if ($stmt->execute()) {
-        echo "Workout session recorded successfully.";
+        $message .= "Workout session recorded successfully.";
+        $messageType = 'success';
     } else {
-        echo "Error recording workout session: " . $conn->error;
+        $message .= "Error recording workout session: " . $conn->error;
+        $messageType = 'danger';
     }
     $stmt->close();
 }
@@ -70,18 +76,18 @@ function displayWorkouts($userID, $planID = null, $unit = 'lbs', $strategies) {
         while ($row = $result->fetch_assoc()) {
             $weight = $row['Weight'] * $conversionFactor;
             echo "<tr>
-                    <td data-label='ID'>" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td data-label='Plan'>" . htmlspecialchars($row['Plan_Name'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td data-label='Exercise'>" . htmlspecialchars($row['Exercise_Name'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td data-label='Sets'>" . htmlspecialchars($row['Sets'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td data-label='Reps'>" . htmlspecialchars($row['Reps'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td data-label='Weight'>" . htmlspecialchars(number_format($weight, 2), ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "</td>
-                    <td data-label='Strategy'>" . htmlspecialchars($strategies[$row['Progressive_Overloading_Strategy']], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td data-label='Actions' class='workoutTableActions'>
-                        <a href='editWorkout.php?ID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-edit btn btn-sm btn-primary'><i class='fas fa-edit'></i>Edit</a>
-                        <a href='?deleteID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "&unit=" . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "' class='button button-delete btn btn-sm btn-danger' onclick='return confirm(\"Are you sure you want to delete this workout?\");'><i class='fas fa-trash-alt'></i>Delete</a>
-                        <a href='?applyOverload=true&workoutID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "&unit=" . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "' class='button button-apply btn btn-sm btn-success'><i class='fas fa-sync-alt'></i> Apply Overload</a>
-                        <a href='workout_history.php?workoutID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-history btn btn-sm btn-info'><i class='fas fa-history'></i> History</a>
+                    <td>" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td>" . htmlspecialchars($row['Plan_Name'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td>" . htmlspecialchars($row['Exercise_Name'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td>" . htmlspecialchars($row['Sets'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td>" . htmlspecialchars($row['Reps'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td>" . htmlspecialchars(number_format($weight, 2), ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "</td>
+                    <td>" . htmlspecialchars($strategies[$row['Progressive_Overloading_Strategy']], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td class='workoutTableActions'>
+                        <a href='editWorkout.php?ID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-edit btn btn-sm btn-primary'><i class='fas fa-edit'></i> Edit</a>
+                        <a href='?deleteID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "&unit=" . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "' class='button button-delete btn btn-sm btn-danger' onclick='return confirm(\"Are you sure you want to delete this workout?\");'><i class='fas fa-trash-alt'></i> Delete</a>
+                        <a href='?applyOverload=true&workoutID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "&unit=" . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "' class='button button-apply btn btn-sm btn-info'><i class='fas fa-sync-alt'></i> Apply Overload</a>
+                        <a href='workout_history.php?workoutID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-history btn btn-sm btn-secondary'><i class='fas fa-history'></i> History</a>
                     </td>
                   </tr>";
         }
