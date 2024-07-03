@@ -4,7 +4,7 @@ include '../../includes/db_connect.php';
 include '../../includes/accesibles.php';
 
 function validate_captcha($captcha_response) {
-    $secret_key = "6Lc59wYqAAAAAMDD1-qpZOByaWnb8tscGGvimNVm";
+    $secret_key = "secretkey";
     $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$captcha_response");
     $response_keys = json_decode($response, true);
     return intval($response_keys["success"]);
