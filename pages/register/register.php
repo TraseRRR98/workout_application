@@ -33,7 +33,7 @@ include '../../includes/accesibles.php';
             </div>
             <div class="form-group">
                 <label for="captcha">CAPTCHA</label>
-                <div class="g-recaptcha" data-sitekey="6Lc59wYqAAAAAEe5c6r8M8lWpolNb999y_eE8SdH"></div>
+                <div class="g-recaptcha" data-sitekey="sitekey"></div>
             </div>
             <button type="submit" class="btn btn-primary">Register</button>
         </form>
