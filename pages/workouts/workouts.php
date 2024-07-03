@@ -70,18 +70,18 @@ function displayWorkouts($userID, $planID = null, $unit = 'lbs', $strategies) {
         while ($row = $result->fetch_assoc()) {
             $weight = $row['Weight'] * $conversionFactor;
             echo "<tr>
-                    <td>" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($row['Plan_Name'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($row['Exercise_Name'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($row['Sets'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($row['Reps'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars(number_format($weight, 2), ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($strategies[$row['Progressive_Overloading_Strategy']], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td class='workoutTableActions'>
-                        <a href='editWorkout.php?ID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-edit'><i class='fas fa-edit'></i>Edit</a>
-                        <a href='?deleteID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "&unit=" . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "' class='button button-delete' onclick='return confirm(\"Are you sure you want to delete this workout?\");'><i class='fas fa-trash-alt'></i>Delete</a>
-                        <a href='?applyOverload=true&workoutID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "&unit=" . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "' class='button button-apply'><i class='fas fa-sync-alt'></i> Apply Overload</a>
-                        <a href='workout_history.php?workoutID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-history'><i class='fas fa-history'></i> History</a>
+                    <td data-label='ID'>" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Plan'>" . htmlspecialchars($row['Plan_Name'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Exercise'>" . htmlspecialchars($row['Exercise_Name'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Sets'>" . htmlspecialchars($row['Sets'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Reps'>" . htmlspecialchars($row['Reps'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Weight'>" . htmlspecialchars(number_format($weight, 2), ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Strategy'>" . htmlspecialchars($strategies[$row['Progressive_Overloading_Strategy']], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Actions' class='workoutTableActions'>
+                        <a href='editWorkout.php?ID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-edit btn btn-sm btn-primary'><i class='fas fa-edit'></i>Edit</a>
+                        <a href='?deleteID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "&unit=" . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "' class='button button-delete btn btn-sm btn-danger' onclick='return confirm(\"Are you sure you want to delete this workout?\");'><i class='fas fa-trash-alt'></i>Delete</a>
+                        <a href='?applyOverload=true&workoutID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "&unit=" . htmlspecialchars($unit, ENT_QUOTES, 'UTF-8') . "' class='button button-apply btn btn-sm btn-success'><i class='fas fa-sync-alt'></i> Apply Overload</a>
+                        <a href='workout_history.php?workoutID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-history btn btn-sm btn-info'><i class='fas fa-history'></i> History</a>
                     </td>
                   </tr>";
         }
@@ -131,7 +131,7 @@ $selectedPlanID = isset($_GET['planID']) ? get_safe('planID') : null;
     <title>Workouts</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="../../css/styles.css"> <!-- Include your external CSS file -->
+    <link rel="stylesheet" href="/workout_application/css/styles.css">
     <script>
         function handleUnitChange() {
             const unit = document.getElementById('unit').value;

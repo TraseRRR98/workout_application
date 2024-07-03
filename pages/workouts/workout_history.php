@@ -43,15 +43,15 @@ function displayWorkoutHistory($workoutID, $userID) {
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             echo "<tr>
-                    <td>" . htmlspecialchars($row['Plan_Name'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($row['Exercise_Name'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($row['Date'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($row['Weight'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($row['Reps'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($row['Sets'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($row['Notes'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td class='sessionTableActions'>
-                        <a href='?deleteHistoryID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "&workoutID=" . htmlspecialchars($workoutID, ENT_QUOTES, 'UTF-8') . "' class='button button-delete' onclick='return confirm(\"Are you sure you want to delete this session?\");'><i class='fas fa-trash-alt'></i> Delete</a>
+                    <td data-label='Plan'>" . htmlspecialchars($row['Plan_Name'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Exercise'>" . htmlspecialchars($row['Exercise_Name'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Date'>" . htmlspecialchars($row['Date'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Weight'>" . htmlspecialchars($row['Weight'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Reps'>" . htmlspecialchars($row['Reps'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Sets'>" . htmlspecialchars($row['Sets'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Notes'>" . htmlspecialchars($row['Notes'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Actions' class='sessionTableActions'>
+                        <a href='?deleteHistoryID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "&workoutID=" . htmlspecialchars($workoutID, ENT_QUOTES, 'UTF-8') . "' class='button button-delete btn btn-sm btn-danger' onclick='return confirm(\"Are you sure you want to delete this session?\");'><i class='fas fa-trash-alt'></i> Delete</a>
                     </td>
                   </tr>";
         }
@@ -93,6 +93,7 @@ $workoutDetails = $workoutID ? getWorkoutDetails($workoutID) : null;
     <title>Workout History</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/workout_application/css/styles.css">
 </head>
 <body>
     <br>

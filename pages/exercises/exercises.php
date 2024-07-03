@@ -18,12 +18,12 @@ function displayExercises() {
         // output data of each row
         while($row = $result->fetch_assoc()) {    
             echo "<tr>
-                    <td>" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($row['Name'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td>" . htmlspecialchars($row['Muscle_Group'], ENT_QUOTES, 'UTF-8') . "</td>
-                    <td class='exerciseTableActions'>
-                        <a href='editExercise.php?ID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-edit'><i class='fas fa-edit'></i>Edit</a>
-                        <a href='?deleteID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-delete' onclick='return confirm(\"Are you sure you want to delete this exercise?\");'><i class='fas fa-trash-alt'></i>Delete</a>
+                    <td data-label='ID'>" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Name'>" . htmlspecialchars($row['Name'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Muscle Group'>" . htmlspecialchars($row['Muscle_Group'], ENT_QUOTES, 'UTF-8') . "</td>
+                    <td data-label='Actions' class='exerciseTableActions'>
+                        <a href='editExercise.php?ID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-edit btn btn-sm btn-primary'><i class='fas fa-edit'></i>Edit</a>
+                        <a href='?deleteID=" . htmlspecialchars($row['ID'], ENT_QUOTES, 'UTF-8') . "' class='button button-delete btn btn-sm btn-danger' onclick='return confirm(\"Are you sure you want to delete this exercise?\");'><i class='fas fa-trash-alt'></i>Delete</a>
                     </td>
                   </tr>";
         }
@@ -83,6 +83,7 @@ if (isset($_GET['deleteID'])) {
     <title>Exercises</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/workout_application/css/styles.css">
 </head>
 <body>
     <br>

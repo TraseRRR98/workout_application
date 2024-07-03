@@ -22,13 +22,13 @@ function displayPlans($userID) {
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             echo "<tr>
-                    <td>{$row['ID']}</td>
-                    <td>{$row['Name']}</td>
-                    <td>{$row['Description']}</td>
-                    <td>{$row['Day_of_Week']}</td>
-                    <td class='planTableActions'>
-                        <a href='editPlan.php?ID={$row['ID']}' class='button button-edit'><i class='fas fa-edit'></i>Edit</a>
-                        <a href='?deleteID={$row['ID']}' class='button button-delete' onclick='return confirm(\"Are you sure you want to delete this plan?\");'><i class='fas fa-trash-alt'></i>Delete</a>
+                    <td data-label='ID'>{$row['ID']}</td>
+                    <td data-label='Name'>{$row['Name']}</td>
+                    <td data-label='Description'>{$row['Description']}</td>
+                    <td data-label='Day of Week'>{$row['Day_of_Week']}</td>
+                    <td data-label='Actions' class='planTableActions'>
+                        <a href='editPlan.php?ID={$row['ID']}' class='button button-edit btn btn-sm btn-primary'><i class='fas fa-edit'></i>Edit</a>
+                        <a href='?deleteID={$row['ID']}' class='button button-delete btn btn-sm btn-danger' onclick='return confirm(\"Are you sure you want to delete this plan?\");'><i class='fas fa-trash-alt'></i>Delete</a>
                     </td>
                   </tr>";
         }
@@ -88,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['addPlan'])) {
     <title>Plans</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/workout_application/css/styles.css">
 </head>
 <body>
     <br>
